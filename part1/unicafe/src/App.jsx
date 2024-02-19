@@ -20,6 +20,7 @@ const Statistic = ({ good, neutral, bad }) => {
       <p>Total: {good + neutral + bad}</p>
       <p>average: {(good - bad) / (good + neutral + bad)}</p>
       <p>positive: {(good / (good + neutral + bad)) * 100} %</p>
+      {""}
     </>
   );
 };
