@@ -27,7 +27,7 @@ const App = () => {
       <div>Has {votes[selected]} votes</div>
       <button
         onClick={() => {
-          const copy = { ...votes };
+          const copy = [...votes];
           copy[selected] += 1;
           setVotes(copy);
           console.log(copy);
@@ -36,6 +36,10 @@ const App = () => {
         Vote
       </button>
       <button onClick={handleClick}>Next</button>
+      <h2>Anecdotes with most votes</h2>
+
+      <div>{anecdotes[votes.indexOf(Math.max(...votes))]}</div>
+      <div>Has {Math.max(...votes)} votes</div>
     </>
   );
 };
