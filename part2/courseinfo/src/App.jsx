@@ -14,12 +14,22 @@ const Part = ({ part }) => {
   );
 };
 
+const Total = ({ parts }) => {
+  return (
+    <p>
+      Number of exercises {parts.reduce((sum, part) => sum + part.exercises, 0)}
+    </p>
+  );
+};
+
 const Content = ({ parts }) => {
   return (
     <div>
       <Part part={parts[0]} />
       <Part part={parts[1]} />
       <Part part={parts[2]} />
+      <Part part={parts[3]} />
+      <Total parts={parts} />
     </div>
   );
 };
@@ -53,6 +63,11 @@ const App = () => {
         name: "State of a component",
         exercises: 14,
         id: 3,
+      },
+      {
+        name: "Redux",
+        exercises: 11,
+        id: 4,
       },
     ],
   };
