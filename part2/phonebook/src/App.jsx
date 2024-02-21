@@ -23,6 +23,14 @@ const App = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    const existingPerson = persons.find(
+      (person) => person.name.toLowerCase() === newName.toLowerCase()
+    );
+
+    if (existingPerson) {
+      alert(`Name "${newName}" already exists in the phonebook.`);
+      return;
+    }
     setPersons([
       ...persons,
       { id: Date.now(), name: newName, number: newNumber },
