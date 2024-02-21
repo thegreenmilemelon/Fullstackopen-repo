@@ -7,10 +7,16 @@ const App = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
     const newPerson = { name: newName };
+    const uniquePerson = persons.find((person) => person.name === newName);
+    if (uniquePerson) {
+      alert(`${newName} is already added to phonebook`);
+      setNewName("");
+      return;
+    }
     setPersons(persons.concat(newPerson));
     setNewName("");
 
-    console.log(persons);
+    console.table(persons);
   };
 
   const handleChange = (event) => {
