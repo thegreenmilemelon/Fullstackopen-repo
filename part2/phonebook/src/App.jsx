@@ -5,17 +5,18 @@ import Filter from "./components/Filter";
 import axios from "axios";
 
 const App = () => {
+  const [filterValue, setFilterValue] = useState("");
+  const [persons, setPersons] = useState([]);
+
+  const [newName, setNewName] = useState("");
+  const [newNumber, setNewNumber] = useState("");
+
   useEffect(() => {
     axios.get("http://localhost:3001/persons").then((response) => {
       console.log("promise fulfilled data", response.data);
       setPersons(response.data);
     });
   }, []);
-
-  const [filterValue, setFilterValue] = useState("");
-  const [persons, setPersons] = useState([]);
-  const [newName, setNewName] = useState("");
-  const [newNumber, setNewNumber] = useState("");
 
   const handleFilter = (event) => {
     setFilterValue(event.target.value);
@@ -31,6 +32,11 @@ const App = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    const newPerson = {
+      name: newName,
+      number: newNumber,
+      id: Date.now(),
+    };
     const existingPerson = persons.find(
       (person) => person.name.toLowerCase() === newName.toLowerCase()
     );
@@ -39,17 +45,20 @@ const App = () => {
       alert(`Name "${newName}" already exists in the phonebook.`);
       return;
     }
-    setPersons([
-      ...persons,
-      { id: Date.now(), name: newName, number: newNumber },
-    ]);
-    setNewName("");
-    setNewNumber("");
+    axios.post("http://localhost:3001/persons", newPerson).then((response) => {
+      setPersons([...persons, newPerson]);
+      setNewName("");
+      setNewNumber("");
+    });
   };
 
   const filteredPersons = persons.filter((person) =>
     person.name.toLowerCase().includes(filterValue.toLowerCase())
   );
+
+  useEffect(() => {
+    console.log(`persons`, persons);
+  }, [persons]);
 
   return (
     <div>
