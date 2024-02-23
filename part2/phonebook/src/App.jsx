@@ -35,7 +35,7 @@ const App = () => {
     const newPerson = {
       name: newName,
       number: newNumber,
-      id: Date.now(),
+      id: Date.now().toString(),
     };
     const existingPerson = persons.find(
       (person) => person.name.toLowerCase() === newName.toLowerCase()
@@ -57,6 +57,15 @@ const App = () => {
     person.name.toLowerCase().includes(filterValue.toLowerCase())
   );
 
+  const handleDestroyPerson = (id) => {
+    const person = persons.find((person) => person.id === id);
+    if (window.confirm(`Delete ${person.name}?`)) {
+      personObject.destroy(id).then(() => {
+        setPersons(persons.filter((person) => person.id !== id));
+      });
+    }
+  };
+
   useEffect(() => {
     console.log(`persons`, persons);
   }, [persons]);
@@ -72,7 +81,10 @@ const App = () => {
         onNumberChange={handleNumberChange}
         onSubmit={handleSubmit}
       />
-      <Persons persons={filteredPersons} />
+      <Persons
+        persons={filteredPersons}
+        onDestroyPerson={handleDestroyPerson}
+      />
     </div>
   );
 };
