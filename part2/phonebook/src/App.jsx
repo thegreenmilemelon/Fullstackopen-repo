@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import Persons from "./components/Persons";
 import PersonForm from "./components/PersonForm";
 import Filter from "./components/Filter";
-import axios from "axios";
 import personObject from "./services/persons";
+import Notification from "./components/Notification";
 
 const App = () => {
   const [filterValue, setFilterValue] = useState("");
@@ -11,6 +11,9 @@ const App = () => {
 
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
+
+  const [message, setMessage] = useState("message to show...");
+  const [msgClassName, setMsgClassName] = useState(null);
 
   useEffect(() => {
     personObject.getAll().then((response) => {
@@ -46,7 +49,13 @@ const App = () => {
     );
 
     if (existingPerson && existingNumber) {
-      alert(`${newName} is already added to phonebook`);
+      const message = `${newName} is already added to phonebook`;
+      setMessage(message);
+      setMsgClassName("error");
+      setTimeout(() => {
+        setMessage(null);
+        setMsgClassName(null);
+      }, 3000);
       return;
     }
 
@@ -54,7 +63,7 @@ const App = () => {
       if (existingPerson.number !== newNumber) {
         if (
           window.confirm(
-            `${newNumber} is already added to phonebook, replace the old number with the new one?`
+            `${newName} is already added to phonebook, replace the old number with the new one?`
           )
         ) {
           personObject
@@ -67,6 +76,30 @@ const App = () => {
               );
               setNewName("");
               setNewNumber("");
+
+              const message = `${newName} was updated with new number`;
+              setMessage(message);
+              setMsgClassName("success");
+              setTimeout(() => {
+                setMessage(null);
+                setMsgClassName(null);
+              }, 3000);
+            })
+            .catch((error) => {
+              const updatedPerson = persons.filter(
+                (person) => person.id !== existingPerson.id
+              );
+              setPersons(updatedPerson);
+              setNewName("");
+              setNewNumber("");
+              const message = `${newName} was not found in the phonebook`;
+              setMessage(message);
+              setMsgClassName("error");
+
+              setTimeout(() => {
+                setMessage(null);
+                setMsgClassName(null);
+              }, 3000);
             });
           return;
         }
@@ -77,6 +110,14 @@ const App = () => {
       setPersons([...persons, response]);
       setNewName("");
       setNewNumber("");
+
+      const message = `${newName} was added to phonebook`;
+      setMessage(message);
+      setMsgClassName("success");
+      setTimeout(() => {
+        setMessage(null);
+        setMsgClassName(null);
+      }, 3000);
     });
   };
 
@@ -99,7 +140,10 @@ const App = () => {
 
   return (
     <div>
-      <h2>Phonebook</h2>
+      <h1>Phonebook</h1>
+
+      <Notification message={message} msgClassName={msgClassName} />
+
       <Filter value={filterValue} onChange={handleFilter} />
       <PersonForm
         newName={newName}
