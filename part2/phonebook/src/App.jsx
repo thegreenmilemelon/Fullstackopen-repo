@@ -12,8 +12,10 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
 
-  const [message, setMessage] = useState("message to show...");
-  const [msgClassName, setMsgClassName] = useState(null);
+  const [notification, setNotification] = useState({
+    message: null,
+    msgClassName: null,
+  });
 
   useEffect(() => {
     personObject.getAll().then((response) => {
@@ -33,6 +35,13 @@ const App = () => {
     setNewNumber(event.target.value);
   };
 
+  const handleNotification = (message, msgClassName) => {
+    setNotification({ message, msgClassName });
+    setTimeout(() => {
+      setNotification({ message: null, msgClassName: null });
+    }, 3000);
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const newPerson = {
@@ -50,12 +59,7 @@ const App = () => {
 
     if (existingPerson && existingNumber) {
       const message = `${newName} is already added to phonebook`;
-      setMessage(message);
-      setMsgClassName("error");
-      setTimeout(() => {
-        setMessage(null);
-        setMsgClassName(null);
-      }, 3000);
+      handleNotification(message, "error");
       return;
     }
 
@@ -78,12 +82,7 @@ const App = () => {
               setNewNumber("");
 
               const message = `${newName} was updated with new number`;
-              setMessage(message);
-              setMsgClassName("success");
-              setTimeout(() => {
-                setMessage(null);
-                setMsgClassName(null);
-              }, 3000);
+              handleNotification(message, "success");
             })
             .catch((error) => {
               const updatedPerson = persons.filter(
@@ -93,13 +92,7 @@ const App = () => {
               setNewName("");
               setNewNumber("");
               const message = `${newName} was not found in the phonebook`;
-              setMessage(message);
-              setMsgClassName("error");
-
-              setTimeout(() => {
-                setMessage(null);
-                setMsgClassName(null);
-              }, 3000);
+              handleNotification(message, "error");
             });
           return;
         }
@@ -112,12 +105,7 @@ const App = () => {
       setNewNumber("");
 
       const message = `${newName} was added to phonebook`;
-      setMessage(message);
-      setMsgClassName("success");
-      setTimeout(() => {
-        setMessage(null);
-        setMsgClassName(null);
-      }, 3000);
+      handleNotification(message, "success");
     });
   };
 
@@ -142,7 +130,10 @@ const App = () => {
     <div>
       <h1>Phonebook</h1>
 
-      <Notification message={message} msgClassName={msgClassName} />
+      <Notification
+        message={notification.message}
+        msgClassName={notification.msgClassName}
+      />
 
       <Filter value={filterValue} onChange={handleFilter} />
       <PersonForm
