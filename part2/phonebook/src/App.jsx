@@ -41,9 +41,36 @@ const App = () => {
       (person) => person.name.toLowerCase() === newName.toLowerCase()
     );
 
-    if (existingPerson) {
-      alert(`Name "${newName}" already exists in the phonebook.`);
+    const existingNumber = persons.find(
+      (person) => person.number === newNumber
+    );
+
+    if (existingPerson && existingNumber) {
+      alert(`${newName} is already added to phonebook`);
       return;
+    }
+
+    if (existingPerson) {
+      if (existingPerson.number !== newNumber) {
+        if (
+          window.confirm(
+            `${newNumber} is already added to phonebook, replace the old number with the new one?`
+          )
+        ) {
+          personObject
+            .update(existingPerson.id, { ...existingPerson, number: newNumber })
+            .then((response) => {
+              setPersons(
+                persons.map((person) =>
+                  person.id !== existingPerson.id ? person : response
+                )
+              );
+              setNewName("");
+              setNewNumber("");
+            });
+          return;
+        }
+      }
     }
 
     personObject.create(newPerson).then((response) => {
