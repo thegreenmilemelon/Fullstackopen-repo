@@ -1,5 +1,12 @@
+import { useState } from "react";
+
 function CountryList({ countries, filterCountry }) {
   console.log(countries);
+  const [isDisplay, setIsDisplay] = useState(false);
+
+  const toggleDisplay = (countryName) => {
+    setIsDisplay(countryName === isDisplay ? false : countryName);
+  };
   const renderCountryDetail = (country) => {
     return (
       <div>
@@ -12,8 +19,8 @@ function CountryList({ countries, filterCountry }) {
         </p>
         <h3>Languages:</h3>
         <ul>
-          {Object.values(country.languages).map((language, index) => (
-            <li key={index}>{language}</li>
+          {Object.values(country.languages).map((language) => (
+            <li key={country.name.common}>{language}</li>
           ))}
         </ul>
         <img
@@ -45,7 +52,13 @@ function CountryList({ countries, filterCountry }) {
     return (
       <ul>
         {countries.map((country) => (
-          <li key={country.name.common}>{country.name.common}</li>
+          <li key={country.name.common}>
+            {country.name.common}{" "}
+            <button onClick={() => toggleDisplay(country.name.common)}>
+              {isDisplay ? "hide" : "show"}
+            </button>
+            {isDisplay === country.name.common && renderCountryDetail(country)}
+          </li>
         ))}
       </ul>
     );
