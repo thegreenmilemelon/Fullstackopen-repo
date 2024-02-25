@@ -5,7 +5,7 @@ function CountryList({ countries, filterCountry }) {
   const [isDisplay, setIsDisplay] = useState(false);
 
   const toggleDisplay = (countryName) => {
-    setIsDisplay(countryName === isDisplay ? false : countryName);
+    setIsDisplay(countryName.ccn3 === isDisplay ? false : countryName.ccn3);
   };
   const renderCountryDetail = (country) => {
     return (
@@ -36,7 +36,7 @@ function CountryList({ countries, filterCountry }) {
     return (
       <ul>
         {countries.map((country) => (
-          <li key={country.name.common}>{country.name.common}</li>
+          <li key={country.ccn3}>{country.name.common}</li>
         ))}
       </ul>
     );
@@ -52,12 +52,12 @@ function CountryList({ countries, filterCountry }) {
     return (
       <ul>
         {countries.map((country) => (
-          <li key={country.name.common}>
+          <li key={country.ccn3}>
             {country.name.common}{" "}
-            <button onClick={() => toggleDisplay(country.name.common)}>
-              {isDisplay ? "hide" : "show"}
+            <button onClick={() => toggleDisplay(country)}>
+              {isDisplay === country.ccn3 ? "hide" : "show"}
             </button>
-            {isDisplay === country.name.common && renderCountryDetail(country)}
+            {isDisplay === country.ccn3 && renderCountryDetail(country)}
           </li>
         ))}
       </ul>
