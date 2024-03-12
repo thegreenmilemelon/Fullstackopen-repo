@@ -30,10 +30,61 @@ test("there are six blogs", async () => {
   assert.strictEqual(response.body.length, 6);
 });
 
-test.only("the unique identifier property of the blog posts is named id", async () => {
+test("the unique identifier property of the blog posts is named id", async () => {
   const response = await api.get("/api/blogs");
   const id = response.body.map((blog) => blog.id);
   assert(id.includes("5a422b3a1b54a676234d17f9"));
+});
+
+test("a blog can be created", async () => {
+  const newBlog = {
+    title: "Test blog",
+    author: "Test author",
+    url: "Test url",
+    likes: 0,
+  };
+  await api
+    .post("/api/blogs")
+    .send(newBlog)
+    .expect(201)
+    .expect("Content-Type", /application\/json/);
+
+  const blogsAtEnd = await helper.blogsInDb();
+  assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length + 1);
+  const contents = blogsAtEnd.map((blog) => blog.title);
+  assert(contents.includes("Test blog"));
+});
+
+test("the default value of likes is zero", async () => {
+  const newBlog = {
+    title: "Test blog",
+    author: "Test author",
+    url: "Test url",
+  };
+  await api
+    .post("/api/blogs")
+    .send(newBlog)
+    .expect(201)
+    .expect("Content-Type", /application\/json/);
+
+  const blogsAtEnd = await helper.blogsInDb();
+  const likes = blogsAtEnd.map((blog) => blog.likes);
+  assert(likes.includes(0));
+});
+
+test.only("blog without title and url cannot be created", async () => {
+  const newBlog = {
+    author: "Test author",
+    likes: 0,
+  };
+  await api
+    .post("/api/blogs")
+    .send(newBlog)
+    .expect(400)
+    .expect("Content-Type", /application\/json/);
+
+  const blogsAtEnd = await helper.blogsInDb();
+  assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length);
 });
 
 after(async () => {
