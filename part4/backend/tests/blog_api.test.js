@@ -72,7 +72,7 @@ test("the default value of likes is zero", async () => {
   assert(likes.includes(0));
 });
 
-test.only("blog without title and url cannot be created", async () => {
+test("blog without title and url cannot be created", async () => {
   const newBlog = {
     author: "Test author",
     likes: 0,
@@ -85,6 +85,29 @@ test.only("blog without title and url cannot be created", async () => {
 
   const blogsAtEnd = await helper.blogsInDb();
   assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length);
+});
+
+test("deletion of a blog", async () => {
+  const blogsAtStart = await helper.blogsInDb();
+  const blogToDelete = blogsAtStart[0];
+  await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
+
+  const blogAtEnd = await helper.blogsInDb();
+  assert.strictEqual(blogAtEnd.length, helper.initialBlogs.length - 1);
+  const contents = blogAtEnd.map((blog) => blog.title);
+  assert(!contents.includes(blogToDelete.title));
+});
+
+test.only("updating a blog", async () => {
+  const blogsAtStart = await helper.blogsInDb();
+  const blogToUpdate = blogsAtStart[0];
+  const initialLikes = blogToUpdate.likes;
+  blogToUpdate.likes = blogToUpdate.likes + 1;
+  await api.put(`/api/blogs/${blogToUpdate.id}`).send(blogToUpdate).expect(200);
+
+  const blogAtEnd = await helper.blogsInDb();
+  const updatedBlog = blogAtEnd.find((blog) => blog.id === blogToUpdate.id);
+  assert.strictEqual(updatedBlog.likes, initialLikes + 1);
 });
 
 after(async () => {
