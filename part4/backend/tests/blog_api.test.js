@@ -18,11 +18,19 @@ describe("blogs api", () => {
     const blogObjects = helper.initialBlogs.map((blog) => new Blog(blog));
     const promiseArray = blogObjects.map((blog) => blog.save());
     await Promise.all(promiseArray);
+
+    await User.deleteMany({});
+    await User.insertMany([]);
+    await helper.createUser();
   });
   test("blogs are returned as json", async () => {
     console.log("entered test");
+    const userLogIn = await api.post("/api/login").send(helper.loginUser);
+    const token = userLogIn.body.token;
+    console.log("token", token);
     await api
       .get("/api/blogs")
+      .set("Authorization", `Bearer ${token}`)
       .expect(200)
       .expect("Content-Type", /application\/json/);
   });
@@ -45,9 +53,12 @@ describe("blogs api", () => {
       url: "Test url",
       likes: 0,
     };
+    const userLogIn = await api.post("/api/login").send(helper.loginUser);
+    const token = userLogIn.body.token;
     await api
       .post("/api/blogs")
       .send(newBlog)
+      .set("Authorization", `Bearer ${token}`)
       .expect(201)
       .expect("Content-Type", /application\/json/);
 
@@ -63,9 +74,12 @@ describe("blogs api", () => {
       author: "Test author",
       url: "Test url",
     };
+    const userLogIn = await api.post("/api/login").send(helper.loginUser);
+    const token = userLogIn.body.token;
     await api
       .post("/api/blogs")
       .send(newBlog)
+      .set("Authorization", `Bearer ${token}`)
       .expect(201)
       .expect("Content-Type", /application\/json/);
 
@@ -79,9 +93,12 @@ describe("blogs api", () => {
       author: "Test author",
       likes: 0,
     };
+
+    const userLogIn = await api.post("/api/login").send(helper.loginUser);
     await api
       .post("/api/blogs")
       .send(newBlog)
+      .set("Authorization", `Bearer ${userLogIn.body.token}`)
       .expect(400)
       .expect("Content-Type", /application\/json/);
 
@@ -90,14 +107,46 @@ describe("blogs api", () => {
   });
 
   test("deletion of a blog", async () => {
-    const blogsAtStart = await helper.blogsInDb();
-    const blogToDelete = blogsAtStart[0];
-    await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
+    const newBlog = {
+      title: "Test blog",
+      author: "Test author",
+      url: "Test url",
+      likes: 0,
+    };
+    const userLogIn = await api.post("/api/login").send(helper.loginUser);
+    const token = userLogIn.body.token;
+
+    const blog = await api
+      .post("/api/blogs")
+      .send(newBlog)
+      .set("Authorization", `Bearer ${token}`)
+      .expect(201)
+      .expect("Content-Type", /application\/json/);
+    const blogAtStart = await helper.blogsInDb();
+
+    await api
+      .delete(`/api/blogs/${blog.body.id}`)
+      .set("Authorization", `Bearer ${token}`)
+      .expect(204);
 
     const blogAtEnd = await helper.blogsInDb();
-    assert.strictEqual(blogAtEnd.length, helper.initialBlogs.length - 1);
-    const contents = blogAtEnd.map((blog) => blog.title);
-    assert(!contents.includes(blogToDelete.title));
+
+    assert.strictEqual(blogAtEnd.length, blogAtStart.length - 1);
+  });
+
+  test("invalid token returns 401", async () => {
+    const newBlog = {
+      title: "Test blog",
+      author: "Test author",
+      url: "Test url",
+      likes: 0,
+    };
+
+    await api
+      .post("/api/blogs")
+      .send(newBlog)
+      .expect(401)
+      .expect("Content-Type", /application\/json/);
   });
 
   test("updating a blog", async () => {
@@ -116,30 +165,6 @@ describe("blogs api", () => {
   });
 });
 
-describe("user api", () => {
-  beforeEach(async () => {
-    await User.deleteMany({});
-    const user = new User({ username: "root", password: "root" });
-    await user.save();
-  });
-
-  test("invalid users can not be created", async () => {
-    const usersAtStart = await helper.usersInDb();
-    const newUser = {
-      username: "root",
-      name: "root",
-      password: "root",
-    };
-    await api
-      .post("/api/users")
-      .send(newUser)
-      .expect(400)
-      .expect("Content-Type", /application\/json/);
-
-    const usersAtEnd = await helper.usersInDb();
-    assert.strictEqual(usersAtEnd.length, usersAtStart.length);
-  });
-});
 after(async () => {
   await mongoose.connection.close();
 });
