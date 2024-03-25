@@ -1,7 +1,7 @@
 const blogsRouter = require("express").Router();
 const Blog = require("../models/blog");
-const User = require("../models/user");
-const jwt = require("jsonwebtoken");
+
+const middleware = require("../utils/middleware");
 
 blogsRouter.get("/", async (request, response) => {
   const blogs = await Blog.find({}).populate("user", {
@@ -21,13 +21,13 @@ blogsRouter.get("/:id", async (request, response) => {
   }
 });
 
-blogsRouter.post("/", async (request, response) => {
+blogsRouter.post("/", middleware.userExtractor, async (request, response) => {
   const body = request.body;
-  const decodedToken = jwt.verify(request.token, process.env.SECRET);
-  if (!decodedToken.id) {
+  const user = request.user;
+
+  if (!user) {
     return response.status(401).json({ error: "token invalid" });
   }
-  const user = await User.findById(decodedToken.id);
 
   if (!body.title || !body.url) {
     return response.status(400).json({ error: "title or url missing" });
@@ -46,24 +46,29 @@ blogsRouter.post("/", async (request, response) => {
   response.status(201).json(savedBlog);
 });
 
-blogsRouter.delete("/:id", async (request, response) => {
-  const decodedToken = jwt.verify(request.token, process.env.SECRET);
-  if (!decodedToken.id) {
-    return response.status(401).json({ error: "Invalid token" });
-  }
-  const blogToDelete = await Blog.findById(request.params.id);
-  if (!blogToDelete) {
-    return response.status(404).json({ error: "Blog not found" });
-  }
+blogsRouter.delete(
+  "/:id",
+  middleware.userExtractor,
+  async (request, response) => {
+    const user = request.user;
 
-  if (blogToDelete.user.toString() !== decodedToken.id.toString()) {
-    return response
-      .status(401)
-      .json({ error: "You do not have permission to delete this blog." });
+    if (!user) {
+      return response.status(401).json({ error: "token invalid" });
+    }
+    const blogToDelete = await Blog.findById(request.params.id);
+    if (!blogToDelete) {
+      return response.status(404).json({ error: "Blog not found" });
+    }
+
+    if (blogToDelete.user.toString() !== user._id.toString()) {
+      return response
+        .status(401)
+        .json({ error: "You do not have permission to delete this blog." });
+    }
+    await Blog.findByIdAndDelete(request.params.id);
+    response.status(204).send();
   }
-  await Blog.findByIdAndDelete(request.params.id);
-  response.status(204).send();
-});
+);
 
 blogsRouter.put("/:id", (request, response, next) => {
   const body = request.body;
