@@ -5,6 +5,7 @@
   "scripts": {
     "start": "cross-env NODE_ENV=production node index.js",
     "dev": "cross-env NODE_ENV=development nodemon index.js",
+    "build:ui": "rm -rf dist && cd ../../part5/bloglist-frontend && npm run build && cp -r dist ../../part4/backend",
     "test": "cross-env NODE_ENV=test node --test",
     "lint": "eslint ."
   },
@@ -31,3 +32,4 @@
     "supertest": "^6.3.4"
   }
 }
+
