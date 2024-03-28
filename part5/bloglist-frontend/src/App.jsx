@@ -123,8 +123,8 @@ const App = () => {
           <button onClick={logout}>Log out</button>
           <br />
           {blogForm()}
-          {blogs.map((blog, i) => {
-            <Blog key={i} blog={blog} />;
+          {blogs.map((blog) => {
+            <Blog key={blog._id} blog={blog} />;
           })}
         </div>
       )}
