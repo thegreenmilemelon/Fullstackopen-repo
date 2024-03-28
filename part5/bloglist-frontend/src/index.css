@@ -1,0 +1,19 @@
+.msg {
+  padding: 20px;
+  margin-bottom: 15px;
+  border-radius: 5px;
+  text-align: center;
+  border: 3px solid #ddd;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.success {
+  background-color: rgb(95, 224, 95);
+}
+
+.error {
+  background-color: lightgrey;
+  color: crimson;
+  border: 3px solid crimson;
+}

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import Blog from "./components/Blog";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
+import Notification from "./components/Notification";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
@@ -11,6 +12,10 @@ const App = () => {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [url, setUrl] = useState("");
+  const [message, setMessage] = useState({
+    text: null,
+    type: null,
+  });
 
   useEffect(() => {
     blogService.getAll().then((initialBlogs) => setBlogs(initialBlogs));
@@ -32,11 +37,18 @@ const App = () => {
 
       window.localStorage.setItem("loggedBlogAppUser", JSON.stringify(user));
       blogService.setToken(user.token);
-
       setUser(user);
       setUsername("");
       setPassword("");
+      setMessage({ text: "Login  successful!", type: "success" });
+      setTimeout(() => {
+        setMessage({ text: null, type: null });
+      }, 5000);
     } catch (exception) {
+      setMessage({ text: "Wrong username or password.", type: "error" });
+      setTimeout(() => {
+        setMessage({ text: null, type: null });
+      }, 5000);
       console.log("failed to login");
     }
   };
@@ -59,6 +71,13 @@ const App = () => {
       setTitle("");
       setAuthor("");
       setUrl("");
+      setMessage({
+        text: `a new blog ${title}`,
+        type: "success",
+      });
+      setTimeout(() => {
+        setMessage({ text: null, type: null });
+      }, 5000);
     });
   };
 
@@ -115,6 +134,7 @@ const App = () => {
   return (
     <div>
       <h1>Blogs</h1>
+      <Notification message={message} />
       {user === null ? (
         loginForm()
       ) : (
