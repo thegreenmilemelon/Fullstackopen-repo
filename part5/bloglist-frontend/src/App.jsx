@@ -95,11 +95,34 @@ const App = () => {
   const changeLike = (id) => {
     const blog = blogs.find((blog) => blog.id === id);
     const changedBlog = { ...blog, likes: blog.likes + 1 };
+
     blogService.update(id, changedBlog).then((returnedBlog) => {
-      returnedBlog.user = blog.user;
-      setBlogs(blogs.map((blog) => (blog.id !== id ? blog : returnedBlog)));
+      const updatedBlog = {
+        ...returnedBlog,
+        user: blog.user,
+      };
+      setBlogs(blogs.map((blog) => (blog.id !== id ? blog : updatedBlog)));
     });
   };
+
+  const removeBlog = async (id) => {
+    try {
+      await blogService.remove(id);
+      setBlogs(blogs.filter((blog) => blog.id !== id));
+      setMessage({ text: "Blog deleted successfully", type: "success" });
+      setTimeout(() => {
+        setMessage({ text: null, type: null });
+      }, 5000);
+    } catch (error) {
+      setMessage({ text: "Failed to delete blog", type: "error" });
+      setTimeout(() => {
+        setMessage({ text: null, type: null });
+      }, 5000);
+      console.error("Error deleting blog:", error);
+    }
+  };
+
+  const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes);
 
   return (
     <div>
@@ -113,12 +136,14 @@ const App = () => {
           <button onClick={logout}>Log out</button>
           <br />
           {blogForm()}
-          {blogs.map((blog, i) => {
+          {sortedBlogs.map((blog, i) => {
             return (
               <Blog
                 key={i}
                 blog={blog}
                 changeLike={() => changeLike(blog.id)}
+                removeBlog={removeBlog}
+                user={user}
               />
             );
           })}
