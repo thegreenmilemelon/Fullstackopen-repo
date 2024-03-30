@@ -96,6 +96,7 @@ const App = () => {
     const blog = blogs.find((blog) => blog.id === id);
     const changedBlog = { ...blog, likes: blog.likes + 1 };
     blogService.update(id, changedBlog).then((returnedBlog) => {
+      returnedBlog.user = blog.user;
       setBlogs(blogs.map((blog) => (blog.id !== id ? blog : returnedBlog)));
     });
   };
