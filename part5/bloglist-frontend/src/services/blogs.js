@@ -9,13 +9,7 @@ const setToken = (newToken) => {
 
 const getAll = () => {
   const request = axios.get(baseUrl);
-  const nonExisting = {
-    title: "No Blog Posts Found",
-    author: "Nobody",
-    url: "https://missing.blog.com",
-    likes: 0,
-  };
-  return request.then((response) => response.data.concat(nonExisting));
+  return request.then((response) => response.data);
 };
 
 const create = (newObject) => {
