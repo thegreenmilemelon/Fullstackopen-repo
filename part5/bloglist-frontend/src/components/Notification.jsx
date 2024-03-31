@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 function Notification({ message }) {
   if (!message.text) {
     return null;
