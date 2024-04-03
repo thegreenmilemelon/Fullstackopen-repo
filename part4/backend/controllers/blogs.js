@@ -1,6 +1,5 @@
 const blogsRouter = require("express").Router();
 const Blog = require("../models/blog");
-
 const middleware = require("../utils/middleware");
 
 blogsRouter.get("/", async (request, response) => {
@@ -22,27 +21,31 @@ blogsRouter.get("/:id", async (request, response) => {
 });
 
 blogsRouter.post("/", middleware.userExtractor, async (request, response) => {
-  const body = request.body;
+  const blog = new Blog(request.body);
   const user = request.user;
 
   if (!user) {
-    return response.status(401).json({ error: "token invalid" });
+    return response.status(403).json({ error: "user missing" });
   }
 
-  if (!body.title || !body.url) {
+  if (!blog.title || !blog.url) {
     return response.status(400).json({ error: "title or url missing" });
   }
 
-  const blog = new Blog({
-    title: body.title,
-    author: body.author,
-    url: body.url,
-    likes: body.likes || 0,
-    user: user._id,
-  });
-  const savedBlog = await blog.save();
-  user.blogs = user.blogs.concat(savedBlog._id);
+  // const blog = new Blog({
+  //   title: body.title,
+  //   author: body.author,
+  //   url: body.url,
+  //   likes: body.likes || 0,
+  //   user: user._id,
+  // });
+  blog.user = user;
+  blog.likes = blog.likes || 0;
+  user.blogs = user.blogs.concat(blog._id);
+
   await user.save();
+
+  const savedBlog = await blog.save();
   response.status(201).json(savedBlog);
 });
 
@@ -57,20 +60,28 @@ blogsRouter.delete(
     }
     const blogToDelete = await Blog.findById(request.params.id);
     if (!blogToDelete) {
-      return response.status(404).json({ error: "Blog not found" });
+      return response.status(204).json({ error: "Blog not found" });
     }
 
-    if (blogToDelete.user.toString() !== user._id.toString()) {
+    if (
+      blogToDelete.user &&
+      blogToDelete.user.toString() !== user._id.toString()
+    ) {
       return response
-        .status(401)
+        .status(403)
         .json({ error: "You do not have permission to delete this blog." });
     }
     await Blog.findByIdAndDelete(request.params.id);
+
+    user.blogs = user.blogs.filter(
+      (blog) => blog._id.toString() !== blogToDelete._id.toString()
+    );
+    await user.save();
     response.status(204).send();
   }
 );
 
-blogsRouter.put("/:id", (request, response, next) => {
+blogsRouter.put("/:id", async (request, response) => {
   const body = request.body;
 
   const blog = {
@@ -80,11 +91,10 @@ blogsRouter.put("/:id", (request, response, next) => {
     likes: body.likes,
   };
 
-  Blog.findByIdAndUpdate(request.params.id, blog, { new: true })
-    .then((updateBlog) => {
-      response.json(updateBlog);
-    })
-    .catch((error) => next(error));
+  const updateBlog = await Blog.findByIdAndUpdate(request.params.id, blog, {
+    new: true,
+  });
+  response.json(updateBlog);
 });
 
 module.exports = blogsRouter;

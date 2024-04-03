@@ -60,18 +60,17 @@ const App = () => {
     setUser(null);
   };
 
-  const addBlog = (blogObject) => {
+  const addBlog = async (blogObject) => {
     blogFormRef.current.toggleVisibility();
-    blogService.create(blogObject).then((returnedBlog) => {
-      setBlogs(blogs.concat(returnedBlog));
-      setMessage({
-        text: `a new blog ${blogObject.title} by ${blogObject.author} added`,
-        type: "success",
-      });
-      setTimeout(() => {
-        setMessage({ text: null, type: null });
-      }, 5000);
+    const returnedBlog = await blogService.create(blogObject);
+    setBlogs(blogs.concat(returnedBlog));
+    setMessage({
+      text: `a new blog ${blogObject.title} by ${blogObject.author} added`,
+      type: "success",
     });
+    setTimeout(() => {
+      setMessage({ text: null, type: null });
+    }, 5000);
   };
 
   const loginForm = () => (
@@ -92,17 +91,13 @@ const App = () => {
     </Togglable>
   );
 
-  const changeLike = (id) => {
-    const blog = blogs.find((blog) => blog.id === id);
-    const changedBlog = { ...blog, likes: blog.likes + 1 };
-
-    blogService.update(id, changedBlog).then((returnedBlog) => {
-      const updatedBlog = {
-        ...returnedBlog,
-        user: blog.user,
-      };
-      setBlogs(blogs.map((blog) => (blog.id !== id ? blog : updatedBlog)));
+  const changeLike = async (blog) => {
+    const changedBlog = await blogService.update(blog.id, {
+      ...blog,
+      likes: blog.likes + 1,
     });
+
+    setBlogs(blogs.map((b) => (b.id === blog.id ? changedBlog : b)));
   };
 
   const removeBlog = async (id) => {
@@ -141,14 +136,14 @@ const App = () => {
               <Blog
                 key={i}
                 blog={blog}
-                changeLike={() => changeLike(blog.id)}
+                changeLike={() => changeLike(blog)}
                 removeBlog={removeBlog}
-                user={user}
               />
             );
           })}
         </div>
       )}
+      <h3>Blog app user</h3>
     </div>
   );
 };
