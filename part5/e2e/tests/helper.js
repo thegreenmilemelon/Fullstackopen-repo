@@ -20,4 +20,11 @@ const logout = async (page) => {
   await page.getByRole("button", { name: "Log out" }).click();
 };
 
-export { loginWith, createBlog, logout };
+const likes = async (page, like, times) => {
+  for (let i = 0; i < times; i++) {
+    await like.click();
+    await page.waitForTimeout(1000);
+  }
+};
+
+export { loginWith, createBlog, logout, likes };

@@ -1,6 +1,7 @@
 const { test, expect, describe, beforeEach } = require("@playwright/test");
 
-const { loginWith, createBlog, logout } = require("./helper");
+const { loginWith, createBlog, logout, likes } = require("./helper");
+const { before } = require("node:test");
 
 describe("Blog App", () => {
   beforeEach(async ({ page, request }) => {
@@ -84,6 +85,54 @@ describe("Blog App", () => {
         await expect(page.getByText("Logged in as Tork Petro")).toBeVisible();
         await page.getByTestId("view").click();
         await expect(page.getByTestId("remove")).not.toBeVisible();
+      });
+    });
+
+    describe("and multiple blogs exist", () => {
+      beforeEach(async ({ page }) => {
+        await createBlog(page, "TestBlog1", "Author1", "http://testurl.com");
+        await createBlog(page, "TestBlog2", "Author2", "http://testurl.com");
+        await createBlog(page, "TestBlog3", "Author3", "http://testurl.com");
+      });
+
+      test("blogs are ordered according to likes", async ({ page }) => {
+        await page.getByText("TestBlog1").getByTestId("view").click();
+        await page.getByText("TestBlog2").getByTestId("view").click();
+        await page.getByText("TestBlog3").getByTestId("view").click();
+
+        await expect(page.getByText("TestBlog1")).toBeVisible();
+
+        const like1 = await page.getByText("TestBlog1").getByTestId("like");
+        await likes(page, like1, 3);
+
+        const like2 = await page.getByText("TestBlog2").getByTestId("like");
+        await likes(page, like2, 2);
+
+        const like3 = await page.getByText("TestBlog3").getByTestId("like");
+        await likes(page, like3, 1);
+
+        await page
+          .getByText("TestBlog1")
+          .getByRole("button", { name: "hide" })
+          .click();
+        await page
+          .getByText("TestBlog2")
+          .getByRole("button", { name: "hide" })
+          .click();
+        await page
+          .getByText("TestBlog3")
+          .getByRole("button", { name: "hide" })
+          .click();
+
+        const blogElements = await page.$$eval(".detail", (blogs) =>
+          blogs.map((blog) => blog.textContent)
+        );
+
+        expect(blogElements).toEqual([
+          "TestBlog1 Author1 view",
+          "TestBlog2 Author2 view",
+          "TestBlog3 Author3 view",
+        ]);
       });
     });
   });

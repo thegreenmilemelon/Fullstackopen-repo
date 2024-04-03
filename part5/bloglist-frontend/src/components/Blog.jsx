@@ -21,7 +21,7 @@ const Blog = ({ blog, changeLike, removeBlog }) => {
   };
 
   return (
-    <div>
+    <div className="detail">
       {blog.title} {blog.author}{" "}
       <button onClick={toggleDetails} data-testid="view">
         {showDetails ? "hide" : "view"}
