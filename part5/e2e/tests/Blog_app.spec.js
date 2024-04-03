@@ -1,6 +1,6 @@
 const { test, expect, describe, beforeEach } = require("@playwright/test");
 
-const { loginWith, createBlog } = require("./helper");
+const { loginWith, createBlog, logout } = require("./helper");
 
 describe("Blog App", () => {
   beforeEach(async ({ page, request }) => {
@@ -74,6 +74,16 @@ describe("Blog App", () => {
         page.on("dialog", (dialog) => dialog.accept());
         await removeButton.click();
         await expect(page.getByText("Blog deleted successfully")).toBeVisible();
+      });
+
+      test("a blog cannot be deleted by another user", async ({ page }) => {
+        await page.getByTestId("view").click();
+        await expect(page.getByTestId("remove")).toBeVisible();
+        await logout(page);
+        await loginWith(page, "torpe", "torpe");
+        await expect(page.getByText("Logged in as Tork Petro")).toBeVisible();
+        await page.getByTestId("view").click();
+        await expect(page.getByTestId("remove")).not.toBeVisible();
       });
     });
   });
