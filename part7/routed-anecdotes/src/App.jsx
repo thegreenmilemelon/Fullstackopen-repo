@@ -1,14 +1,8 @@
+/* eslint-disable react/no-unescaped-entities */
 /* eslint-disable react/prop-types */
 import { useState } from "react";
 
-import {
-  Routes,
-  Route,
-  Link,
-  Navigate,
-  useNavigate,
-  useMatch,
-} from "react-router-dom";
+import { Routes, Route, Link, useNavigate, useMatch } from "react-router-dom";
 
 const Menu = () => {
   const padding = {
@@ -97,6 +91,9 @@ const CreateNew = (props) => {
       info,
       votes: 0,
     });
+
+    props.setNotification(`a new anecdote ${content} created`);
+
     navigate("/");
   };
 
@@ -159,17 +156,23 @@ const App = () => {
     setAnecdotes(anecdotes.concat(anecdote));
   };
 
-  const anecdoteById = (id) => anecdotes.find((a) => a.id === id);
+  // const anecdoteById = (id) => anecdotes.find((a) => a.id === id);
 
-  const vote = (id) => {
-    const anecdote = anecdoteById(id);
+  // const vote = (id) => {
+  //   const anecdote = anecdoteById(id);
 
-    const voted = {
-      ...anecdote,
-      votes: anecdote.votes + 1,
-    };
+  //   const voted = {
+  //     ...anecdote,
+  //     votes: anecdote.votes + 1,
+  //   };
 
-    setAnecdotes(anecdotes.map((a) => (a.id === id ? voted : a)));
+  //   setAnecdotes(anecdotes.map((a) => (a.id === id ? voted : a)));
+  // };
+  const updateNotification = (message) => {
+    setNotification(message);
+    setTimeout(() => {
+      setNotification("");
+    }, 5000);
   };
   const match = useMatch("/anecdotes/:id");
   const anecdote = match
@@ -181,6 +184,7 @@ const App = () => {
       <div>
         <h1>Software anecdotes</h1>
         <Menu />
+        {notification}
       </div>
 
       <div>
@@ -191,7 +195,12 @@ const App = () => {
           />
           <Route path="/" element={<AnecdoteList anecdotes={anecdotes} />} />
           <Route path="/about" element={<About />} />
-          <Route path="/create" element={<CreateNew addNew={addNew} />} />
+          <Route
+            path="/create"
+            element={
+              <CreateNew addNew={addNew} setNotification={updateNotification} />
+            }
+          />
         </Routes>
       </div>
       <br />
