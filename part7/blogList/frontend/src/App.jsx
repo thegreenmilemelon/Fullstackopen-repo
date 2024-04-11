@@ -7,15 +7,16 @@ import Togglable from "./components/Togglable";
 import BlogForm from "./components/BlogForm";
 import LoginForm from "./components/LoginForm";
 
+import { useDispatch } from "react-redux";
+import { setNotification } from "./reducers/notificationReducer";
+
 const App = () => {
+  const dispatch = useDispatch();
+
   const [blogs, setBlogs] = useState([]);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
-  const [message, setMessage] = useState({
-    text: null,
-    type: null,
-  });
 
   const blogFormRef = useRef();
 
@@ -42,15 +43,17 @@ const App = () => {
       setUser(user);
       setUsername("");
       setPassword("");
-      setMessage({ text: "Login  successful!", type: "success" });
-      setTimeout(() => {
-        setMessage({ text: null, type: null });
-      }, 5000);
+
+      dispatch(
+        setNotification({ text: "Login successful!", type: "success" }, 5)
+      );
     } catch (exception) {
-      setMessage({ text: "Wrong username or password.", type: "error" });
-      setTimeout(() => {
-        setMessage({ text: null, type: null });
-      }, 5000);
+      dispatch(
+        setNotification(
+          { text: "Wrong username or password.", type: "error" },
+          5
+        )
+      );
       console.log("failed to login");
     }
   };
@@ -122,12 +125,12 @@ const App = () => {
   return (
     <div>
       <h1>Blogs</h1>
-      <Notification message={message} />
+      <Notification />
       {user === null ? (
         loginForm()
       ) : (
         <div>
-          Logged in as {user.name}.<br />
+          Logged in as {user.username}.<br />
           <button onClick={logout}>Log out</button>
           <br />
           {blogForm()}
