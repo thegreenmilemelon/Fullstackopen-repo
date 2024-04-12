@@ -12,6 +12,7 @@ import { logout, setUser } from "./reducers/userReducer";
 import storage from "./services/storage";
 
 import { initializeAllUsers } from "./reducers/allUsersReducer";
+import UserInfo from "./components/UserInfo";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -63,6 +64,8 @@ const App = () => {
           <br />
           {blogForm()}
           <BlogList />
+          <br />
+          <UserInfo />
         </div>
       )}
       <h3>Blog app user</h3>
