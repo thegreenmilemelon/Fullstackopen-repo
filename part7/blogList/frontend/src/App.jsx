@@ -3,6 +3,7 @@ import Notification from "./components/Notification";
 import Togglable from "./components/Togglable";
 import BlogForm from "./components/BlogForm";
 import LoginForm from "./components/LoginForm";
+import Users from "./components/Users";
 
 import { useDispatch, useSelector } from "react-redux";
 import { initializeBlogs } from "./reducers/blogReducer";
@@ -10,14 +11,16 @@ import BlogList from "./components/BlogList";
 import { logout, setUser } from "./reducers/userReducer";
 import storage from "./services/storage";
 
+import { initializeAllUsers } from "./reducers/allUsersReducer";
+
 const App = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
 
   const blogFormRef = useRef();
-
   useEffect(() => {
     dispatch(initializeBlogs());
+    dispatch(initializeAllUsers());
   }, []);
 
   useEffect(() => {
@@ -63,6 +66,7 @@ const App = () => {
         </div>
       )}
       <h3>Blog app user</h3>
+      <Users />
     </div>
   );
 };
