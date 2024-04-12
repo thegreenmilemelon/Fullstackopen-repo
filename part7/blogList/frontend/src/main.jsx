@@ -4,7 +4,7 @@ import "./index.css";
 import { Provider } from "react-redux";
 import store from "./store.js";
 
-console.log("store:", store.getState());
+console.log("store from main jsx:", store.getState());
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <Provider store={store}>

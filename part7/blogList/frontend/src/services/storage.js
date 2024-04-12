@@ -12,4 +12,8 @@ const me = () => {
   return user ? user.username : null;
 };
 
-export default { saveUser, loadUser, me };
+const clearUser = () => {
+  localStorage.removeItem("loggedBlogAppUser");
+};
+
+export default { saveUser, loadUser, me, clearUser };

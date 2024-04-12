@@ -15,11 +15,6 @@ const Blog = ({ blog }) => {
     ? blog.user.username === storage.me()
     : true;
 
-  console.log("Before Like blog user:", blog.user);
-  console.log("Before like blog username", blog.user.username);
-  console.log("Before Like Storage", storage.me());
-  console.log("Before Like Truthy of blogBelongsToUser", blogBelongsToUser);
-
   const handleRemoveBlog = () => {
     if (window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)) {
       console.log("Removing blog", blog.id);
@@ -28,12 +23,7 @@ const Blog = ({ blog }) => {
   };
 
   const changeLike = () => {
-    console.log("Clicked:", blog.id);
     dispatch(likeBlog(blog));
-    console.log("After like blog user", blog.user);
-    console.log("After like blog username", blog.user.username);
-    console.log("After like storage.me", storage.me());
-    console.log("After like Truthy of blogBelongsToUser", blogBelongsToUser);
   };
 
   return (
