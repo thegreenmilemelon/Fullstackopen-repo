@@ -1,23 +1,39 @@
-import { useState } from "react";
-import PropTypes from "prop-types";
+import { useState, useEffect } from "react";
 import storage from "../services/storage";
+import { removeBlog, likeBlog } from "../reducers/blogReducer";
+import { useDispatch } from "react-redux";
 
-const Blog = ({ blog, changeLike, removeBlog }) => {
+const Blog = ({ blog }) => {
+  const dispatch = useDispatch();
   const [showDetails, setShowDetails] = useState(false);
 
   const toggleDetails = () => {
     setShowDetails(!showDetails);
   };
+
   const blogBelongsToUser = blog.user
     ? blog.user.username === storage.me()
     : true;
 
-  console.log("Storage:", blog.user, storage.me(), blogBelongsToUser);
+  console.log("Before Like blog user:", blog.user);
+  console.log("Before like blog username", blog.user.username);
+  console.log("Before Like Storage", storage.me());
+  console.log("Before Like Truthy of blogBelongsToUser", blogBelongsToUser);
 
   const handleRemoveBlog = () => {
     if (window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)) {
-      removeBlog(blog.id);
+      console.log("Removing blog", blog.id);
+      dispatch(removeBlog(blog.id));
     }
+  };
+
+  const changeLike = () => {
+    console.log("Clicked:", blog.id);
+    dispatch(likeBlog(blog));
+    console.log("After like blog user", blog.user);
+    console.log("After like blog username", blog.user.username);
+    console.log("After like storage.me", storage.me());
+    console.log("After like Truthy of blogBelongsToUser", blogBelongsToUser);
   };
 
   return (
@@ -45,13 +61,6 @@ const Blog = ({ blog, changeLike, removeBlog }) => {
       )}
     </div>
   );
-};
-
-Blog.propTypes = {
-  blog: PropTypes.object.isRequired,
-  changeLike: PropTypes.func.isRequired,
-  removeBlog: PropTypes.func.isRequired,
-  user: PropTypes.object,
 };
 
 export default Blog;
