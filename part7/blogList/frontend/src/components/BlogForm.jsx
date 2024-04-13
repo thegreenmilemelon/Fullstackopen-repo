@@ -7,10 +7,6 @@ import { createBlog } from "../reducers/blogReducer";
 const BlogForm = ({ toggleVisibility }) => {
   const dispatch = useDispatch();
 
-  // const [title, setTitle] = useState("");
-  // const [author, setAuthor] = useState("");
-  // const [url, setUrl] = useState("");
-
   const addBlog = (event) => {
     event.preventDefault();
 

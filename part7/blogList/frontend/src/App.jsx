@@ -13,11 +13,13 @@ import storage from "./services/storage";
 
 import { initializeAllUsers } from "./reducers/allUsersReducer";
 import UserInfo from "./components/UserInfo";
+import { Routes, Route, Link, Navigate, useMatch } from "react-router-dom";
+import Blog from "./components/Blog";
+import SingleBlogInfo from "./components/SingleBlogInfo";
 
 const App = () => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
-
   const blogFormRef = useRef();
   useEffect(() => {
     dispatch(initializeBlogs());
@@ -51,25 +53,47 @@ const App = () => {
     </Togglable>
   );
 
+  const HomePage = () => (
+    <div>
+      {blogForm()}
+      <BlogList />
+    </div>
+  );
+
   return (
     <div>
-      <h1>Blogs</h1>
-      <Notification />
-      {user === null ? (
-        loginForm()
-      ) : (
-        <div>
-          Logged in as {user.username}.<br />
-          <button onClick={handleLogout}>Log out</button>
-          <br />
-          {blogForm()}
-          <BlogList />
-          <br />
-          <UserInfo />
-        </div>
-      )}
-      <h3>Blog app user</h3>
-      <Users />
+      <div>
+        <Link style={{ marginRight: 10 }} to="/">
+          Home
+        </Link>
+        <Link style={{ marginRight: 10 }} to="/users">
+          Users
+        </Link>
+        <Link style={{ marginRight: 10 }} to="/blogs">
+          Blogs
+        </Link>
+        {user ? (
+          <p>
+            {user.username} logged in{" "}
+            <button onClick={handleLogout}>Logout</button>
+          </p>
+        ) : (
+          <em>
+            <Link to="/login">Login</Link>
+          </em>
+        )}
+      </div>
+      <Routes>
+        <Route path="/blogs/:id" element={<SingleBlogInfo />} />
+        <Route path="/" element={user ? <HomePage /> : loginForm()} />
+        <Route path="/users" element={<Users />} />
+        <Route path="/blogs" element={<BlogList />} />
+        <Route
+          path="/login"
+          element={user ? <Navigate to="/" /> : <LoginForm />}
+        />
+        <Route path="/users/:id" element={<UserInfo />} />
+      </Routes>
     </div>
   );
 };

@@ -1,8 +1,18 @@
-import React from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { initializeAllUsers } from "../reducers/allUsersReducer";
 
 export default function Users() {
+  const dispatch = useDispatch();
+
+  //needed to update after each createblog
+  useEffect(() => {
+    dispatch(initializeAllUsers());
+  }, []);
+
   const users = useSelector((state) => state.users);
+  console.log("users in users", users);
 
   if (users.length === 0) {
     return <div>No users found</div>;
@@ -22,7 +32,9 @@ export default function Users() {
         <tbody>
           {users.map((user) => (
             <tr key={user.id}>
-              <td>{user.username}</td>
+              <td>
+                <Link to={`/users/${user.id}`}>{user.username}</Link>
+              </td>
               <td>{user.blogs.length}</td>
             </tr>
           ))}

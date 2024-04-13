@@ -1,22 +1,30 @@
 import { useSelector } from "react-redux";
-
-import Blog from "./Blog";
-
-export default function BlogList({ loggedInUser }) {
+import { Link } from "react-router-dom";
+import storage from "../services/storage";
+export default function BlogList() {
   const blogs = useSelector((state) => state.blogs);
-  const sortedBlogs = [...blogs].sort((a, b) => b.likes - a.likes);
 
-  if (blogs.length === 0) {
+  const currentUser = storage.me();
+
+  const sortedBlogs = [...blogs]
+    .filter((blog) => blog.user.username === currentUser)
+    .sort((a, b) => b.likes - a.likes);
+
+  if (sortedBlogs.length === 0) {
     return (
       <div>
-        <h2>No blogs found</h2>
+        <p>Blogs Pending...</p>
       </div>
     );
   }
   return (
     <div>
       {sortedBlogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} />
+        <div key={blog.id}>
+          <Link to={`/blogs/${blog.id}`}>
+            {blog.title} {blog.author}
+          </Link>
+        </div>
       ))}
     </div>
   );
