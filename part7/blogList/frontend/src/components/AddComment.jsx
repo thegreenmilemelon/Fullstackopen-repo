@@ -3,11 +3,11 @@ import { useParams } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { createComment } from "../reducers/commentReducer";
 import { addComment } from "../reducers/blogReducer";
+import { Box, Button, TextField, Typography } from "@mui/material";
 
 export default function AddComment() {
   const dispatch = useDispatch();
   const { id } = useParams();
-
   const blog = useSelector((state) =>
     state.blogs.find((blog) => blog.id === id)
   );
@@ -15,23 +15,27 @@ export default function AddComment() {
   const handleSubmit = (event) => {
     event.preventDefault();
     const comment = event.target.comment.value;
-
     // dispatch(createComment({ content: comment, id }));
-
     dispatch(addComment({ content: comment, id }));
     event.target.reset();
-    // console.log(comment);
   };
 
   return (
-    <div>
-      <h2>Add Comment</h2>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="comment">Comment:</label>
-        <input id="comment" name="comment"></input>
-        <br />
-        <button type="submit">Add Comment</button>
-      </form>
-    </div>
+    <Box component="form" onSubmit={handleSubmit} mt={2}>
+      <Typography variant="h6" gutterBottom>
+        Add Comment
+      </Typography>
+      <TextField
+        id="comment"
+        name="comment"
+        label="Comment"
+        variant="outlined"
+        fullWidth
+        margin="normal"
+      />
+      <Button type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
+        Add Comment
+      </Button>
+    </Box>
   );
 }

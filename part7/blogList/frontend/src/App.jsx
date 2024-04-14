@@ -63,10 +63,12 @@ const App = () => {
   );
 
   const HomePage = () => (
-    <div>
-      {blogForm()}
-      <BlogList />
-    </div>
+    <Box display="flex" flexDirection="column" alignItems="center">
+      <Box my={4}>{blogForm()}</Box>
+      <Box my={4}>
+        <BlogList />
+      </Box>
+    </Box>
   );
 
   return (

@@ -1,6 +1,14 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import {
+  Box,
+  Typography,
+  List,
+  ListItem,
+  ListItemText,
+  Divider,
+} from "@mui/material";
 
 export default function UserInfo() {
   const { id } = useParams();
@@ -9,22 +17,23 @@ export default function UserInfo() {
   if (!userInfo) {
     return <div>User not found</div>;
   }
-  return (
-    <div>
-      <div>
-        <p>Blogs added by:</p>
-        <p>{userInfo.username}</p>
 
-        {userInfo && (
-          <ul>
-            {userInfo.blogs.map((blog) => (
-              <li key={blog.id}>
-                {blog.title} by {blog.author}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-    </div>
+  return (
+    <Box mt={4}>
+      <Typography variant="h5" gutterBottom>
+        Blogs added by: {userInfo.username}
+      </Typography>
+      <Divider />
+      <List>
+        {userInfo.blogs.map((blog) => (
+          <ListItem key={blog.id}>
+            <ListItemText
+              primary={blog.title}
+              secondary={`by ${blog.author}`}
+            />
+          </ListItem>
+        ))}
+      </List>
+    </Box>
   );
 }
