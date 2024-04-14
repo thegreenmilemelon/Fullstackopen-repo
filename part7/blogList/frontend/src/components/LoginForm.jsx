@@ -5,7 +5,7 @@ import storage from "../services/storage";
 const LoginForm = () => {
   const dispatch = useDispatch();
 
-  const handleLogin = (event) => {
+  const handleLogin = async (event) => {
     event.preventDefault();
     const user = {
       username: event.target.Username.value,

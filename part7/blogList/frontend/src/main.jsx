@@ -7,7 +7,7 @@ import store from "./store.js";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 
 store.subscribe(() => {
-  console.log("store from main jsx:", store.getState());
+  // console.log("store from main jsx:", store.getState());
 });
 
 ReactDOM.createRoot(document.getElementById("root")).render(

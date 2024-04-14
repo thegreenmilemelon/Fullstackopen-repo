@@ -12,7 +12,7 @@ export default function Users() {
   }, []);
 
   const users = useSelector((state) => state.users);
-  console.log("users in users", users);
+  // console.log("users in users", users);
 
   if (users.length === 0) {
     return <div>No users found</div>;

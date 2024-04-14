@@ -39,8 +39,6 @@ blogsRouter.post("/", middleware.userExtractor, async (request, response) => {
 
   const comments = request.comments;
 
-  console.log("comments", comments);
-
   if (!user) {
     return response.status(401).json({ error: "token is missing or invalid" });
   }

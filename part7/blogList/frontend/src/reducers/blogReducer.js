@@ -1,5 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import blogService from "../services/blogs";
+import storage from "../services/storage";
+import commentService from "../services/comments";
 
 const blogSlice = createSlice({
   name: "blogs",
@@ -11,12 +13,6 @@ const blogSlice = createSlice({
     addBlog(state, action) {
       state.push(action.payload);
     },
-    updateBlog(state, action) {
-      const updatedBlog = action.payload;
-      return state.map((blog) =>
-        blog.id === updatedBlog.id ? updatedBlog : blog
-      );
-    },
   },
 });
 
@@ -25,6 +21,7 @@ export const { setBlogs, addBlog, updateBlog } = blogSlice.actions;
 export const initializeBlogs = () => {
   return async (dispatch) => {
     const blogs = await blogService.getAll();
+    blogService.setToken(storage.loadUser().token);
     dispatch(setBlogs(blogs));
   };
 };
@@ -32,6 +29,7 @@ export const initializeBlogs = () => {
 export const createBlog = (blogObject) => {
   return async (dispatch) => {
     const newBlog = await blogService.create(blogObject);
+
     dispatch(addBlog(newBlog));
   };
 };
@@ -54,6 +52,22 @@ export const likeBlog = (blog) => {
     const blogs = getState().blogs.map((b) =>
       b.id === blog.id ? changedBlog : b
     );
+    dispatch(setBlogs(blogs));
+  };
+};
+
+export const addComment = (comment) => {
+  return async (dispatch, getState) => {
+    const newComment = await commentService.create(comment);
+    const blogs = getState().blogs.map((blog) => {
+      if (blog.id === comment.id) {
+        return {
+          ...blog,
+          comment: [...blog.comment, newComment],
+        };
+      }
+      return blog;
+    });
     dispatch(setBlogs(blogs));
   };
 };

@@ -19,6 +19,6 @@ export const initializeAllUsers = () => {
   return async (dispatch) => {
     const users = await userService.getAll();
     dispatch(setAllUsers(users));
-    console.log("All users", users);
+    // console.log("All users", users);
   };
 };

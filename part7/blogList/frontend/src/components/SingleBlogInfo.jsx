@@ -23,7 +23,7 @@ export default function SingleBlogInfo() {
   if (!blog) {
     return <div>Blog not found</div>;
   }
-  console.log("eachblog:", blog);
+  // console.log("eachblog:", blog);
   return (
     <div>
       <h2>{blog.title}</h2>
@@ -40,8 +40,8 @@ export default function SingleBlogInfo() {
 
       <h3>Comments</h3>
       <ul>
-        {blog.comment.map((comment) => (
-          <li key={comment.id}>{comment.content}</li>
+        {blog.comment.map((comment, i) => (
+          <li key={i}>{comment.content}</li>
         ))}
       </ul>
     </div>

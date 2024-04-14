@@ -2,6 +2,7 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { createComment } from "../reducers/commentReducer";
+import { addComment } from "../reducers/blogReducer";
 
 export default function AddComment() {
   const dispatch = useDispatch();
@@ -15,9 +16,11 @@ export default function AddComment() {
     event.preventDefault();
     const comment = event.target.comment.value;
 
-    dispatch(createComment({ content: comment, id }));
+    // dispatch(createComment({ content: comment, id }));
+
+    dispatch(addComment({ content: comment, id }));
     event.target.reset();
-    console.log(comment);
+    // console.log(comment);
   };
 
   return (
