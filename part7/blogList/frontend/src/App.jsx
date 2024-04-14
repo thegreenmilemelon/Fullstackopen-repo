@@ -13,9 +13,18 @@ import storage from "./services/storage";
 
 import { initializeAllUsers } from "./reducers/allUsersReducer";
 import UserInfo from "./components/UserInfo";
-import { Routes, Route, Link, Navigate, useMatch } from "react-router-dom";
-import Blog from "./components/Blog";
+import { Routes, Route, Link, Navigate } from "react-router-dom";
 import SingleBlogInfo from "./components/SingleBlogInfo";
+
+import {
+  Container,
+  Button,
+  Box,
+  Typography,
+  AppBar,
+  Toolbar,
+  IconButton,
+} from "@mui/material";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -61,28 +70,39 @@ const App = () => {
   );
 
   return (
-    <div>
-      <div>
-        <Link style={{ marginRight: 10 }} to="/">
-          Home
-        </Link>
-        <Link style={{ marginRight: 10 }} to="/users">
-          Users
-        </Link>
-        <Link style={{ marginRight: 10 }} to="/blogs">
-          Blogs
-        </Link>
-        {user ? (
-          <p>
-            {user.username} logged in{" "}
-            <button onClick={handleLogout}>Logout</button>
-          </p>
-        ) : (
-          <em>
-            <Link to="/login">Login</Link>
-          </em>
-        )}
-      </div>
+    <Container>
+      <AppBar position="static">
+        <Toolbar>
+          <IconButton
+            edge="start"
+            color="inherit"
+            aria-label="menu"
+          ></IconButton>
+          <Button color="inherit" component={Link} to="/">
+            Home
+          </Button>
+          <Button color="inherit" component={Link} to="/users">
+            Users
+          </Button>
+          <Button color="inherit" component={Link} to="/blogs">
+            Blogs
+          </Button>
+          {user ? (
+            <Box display="flex" alignItems="center">
+              <Typography variant="body1" color="inherit" mr={1}>
+                {user.username} logged in
+              </Typography>
+              <Button color="inherit" onClick={handleLogout}>
+                Logout
+              </Button>
+            </Box>
+          ) : (
+            <Button color="inherit" component={Link} to="/login">
+              Login
+            </Button>
+          )}
+        </Toolbar>
+      </AppBar>
       <Routes>
         <Route path="/blogs/:id" element={<SingleBlogInfo />} />
         <Route path="/" element={user ? <HomePage /> : loginForm()} />
@@ -94,7 +114,7 @@ const App = () => {
         />
         <Route path="/users/:id" element={<UserInfo />} />
       </Routes>
-    </div>
+    </Container>
   );
 };
 

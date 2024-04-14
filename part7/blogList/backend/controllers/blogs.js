@@ -1,22 +1,30 @@
 const blogsRouter = require("express").Router();
 const Blog = require("../models/blog");
 const middleware = require("../utils/middleware");
+const User = require("../models/user");
+const Comment = require("../models/comment");
 
 blogsRouter.get("/", async (request, response) => {
-  const blogs = await Blog.find({}).populate("user", {
-    username: 1,
-    name: 1,
-    user: 1,
-  });
+  const blogs = await Blog.find({})
+    .populate("user", {
+      username: 1,
+      name: 1,
+      user: 1,
+    })
+    .populate("comment", {
+      content: 1,
+    });
   response.json(blogs);
 });
 
 blogsRouter.get("/:id", async (request, response) => {
-  const blog = await Blog.findById(request.params.id).populate("user", {
-    username: 1,
-    name: 1,
-    user: 1,
-  });
+  const blog = await Blog.findById(request.params.id)
+    .populate("user", {
+      username: 1,
+      name: 1,
+      user: 1,
+    })
+    .populate("comment");
   if (blog) {
     response.json(blog);
   } else {
@@ -25,32 +33,39 @@ blogsRouter.get("/:id", async (request, response) => {
 });
 
 blogsRouter.post("/", middleware.userExtractor, async (request, response) => {
-  const blog = new Blog(request.body);
+  const body = request.body;
+
   const user = request.user;
 
+  const comments = request.comments;
+
+  console.log("comments", comments);
+
   if (!user) {
-    return response.status(403).json({ error: "user missing" });
+    return response.status(401).json({ error: "token is missing or invalid" });
   }
 
-  if (!blog.title || !blog.url) {
-    return response.status(400).json({ error: "title or url missing" });
+  const blog = new Blog({
+    title: body.title,
+    author: body.author,
+    url: body.url,
+    user: user,
+    likes: body.likes,
+    comment: comments,
+  });
+
+  if (!blog.title && !blog.url) {
+    response.status(400).end();
+  } else {
+    if (!blog.likes) {
+      blog.likes = 0;
+    }
+    const savedBlog = await blog.save();
+    user.blogs = user.blogs.concat(savedBlog._id);
+    await user.save();
+
+    response.status(201).json(savedBlog);
   }
-
-  // const blog = new Blog({
-  //   title: body.title,
-  //   author: body.author,
-  //   url: body.url,
-  //   likes: body.likes || 0,
-  //   user: user._id,
-  // });
-  blog.user = user;
-  blog.likes = blog.likes || 0;
-  user.blogs = user.blogs.concat(blog._id);
-
-  await user.save();
-
-  const savedBlog = await blog.save();
-  response.status(201).json(savedBlog);
 });
 
 blogsRouter.delete(
