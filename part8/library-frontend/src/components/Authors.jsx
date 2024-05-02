@@ -18,7 +18,6 @@ const Authors = (props) => {
     value: a.name,
     label: a.name,
   }));
-  console.log("Authors result: ", result);
 
   return (
     <div>

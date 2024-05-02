@@ -28,7 +28,7 @@ mongoose
 const typeDefs = `
 type User {
   username: String!
-  favoriteGenre: String
+  favoriteGenre: String!
   id: ID!
 }
 
@@ -132,11 +132,12 @@ const resolvers = {
           author = new Author({ name: args.author });
           await author.save();
         }
+        const lowercaseGenres = args.genres.map((genre) => genre.toLowerCase());
         const book = new Book({
           title: args.title,
           published: args.published,
           author: author._id, // Set the author field to the author's _id
-          genres: args.genres,
+          genres: lowercaseGenres,
         });
 
         const newBook = await book.save();
