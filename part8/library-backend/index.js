@@ -40,12 +40,13 @@ type User {
     name: String!
     id: ID!
     born: Int
+    bookCount: Int
   }
 
   type Book {
     title: String!
     published: Int!
-    author: Author!
+    author: Author
     id: ID!
     genres: [String!]
   }
@@ -80,11 +81,18 @@ type User {
 `;
 
 const resolvers = {
+  Author: {
+    bookCount: async (root) => {
+      const author = await Author.findOne({ name: root.name });
+      const book = await Book.find({ author: author._id });
+      return book.length;
+    },
+  },
   Query: {
     authorCount: async () => await Author.collection.countDocuments(),
     bookCount: async () => await Book.collection.countDocuments(),
     allBooks: async (root, args) => {
-      let filter = {};
+      const filter = {};
       if (args.author) {
         const author = await Author.findOne({ name: args.author });
         if (author) {
@@ -94,7 +102,7 @@ const resolvers = {
         }
       }
       if (args.genre) {
-        filter.genres = args.genre;
+        filter.genres = { $in: [args.genre] };
       }
       return await Book.find(filter).populate("author");
     },
@@ -121,17 +129,18 @@ const resolvers = {
         let author = await Author.findOne({ name: args.author });
 
         if (!author) {
-          const author = new Author({ name: args.author });
+          author = new Author({ name: args.author });
           await author.save();
         }
-        const book = new Book({ ...args, author });
+        const book = new Book({
+          title: args.title,
+          published: args.published,
+          author: author._id, // Set the author field to the author's _id
+          genres: args.genres,
+        });
 
-        if (!book.genres) {
-          book.genres = [];
-        }
-
-        await book.save();
-        return book.populate("author");
+        const newBook = await book.save();
+        return newBook.populate("author");
       } catch (error) {
         if (error.name === "ValidationError") {
           throw new GraphQLError(error.message, {
@@ -142,6 +151,7 @@ const resolvers = {
             },
           });
         }
+        throw new GraphQLError(error.message);
       }
     },
 

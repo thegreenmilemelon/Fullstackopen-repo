@@ -8,7 +8,6 @@ const NewBook = (props) => {
   const [published, setPublished] = useState("");
   const [genre, setGenre] = useState("");
   const [genres, setGenres] = useState([]);
-
   const [createBook] = useMutation(CREATE_BOOK, {
     refetchQueries: [{ query: ALL_BOOKS }, { query: ALL_AUTHORS }],
     onError: (error) => {
@@ -22,11 +21,15 @@ const NewBook = (props) => {
 
   const submit = async (event) => {
     event.preventDefault();
-
     console.log("add book...");
-
-    createBook({ variables: { title, author, published, genres } });
-
+    createBook({
+      variables: {
+        title,
+        published: parseInt(published),
+        authorName: author,
+        genres,
+      },
+    });
     setTitle("");
     setPublished("");
     setAuthor("");
@@ -43,25 +46,25 @@ const NewBook = (props) => {
     <div>
       <form onSubmit={submit}>
         <div>
-          title
+          title{" "}
           <input
             value={title}
             onChange={({ target }) => setTitle(target.value)}
           />
         </div>
         <div>
-          author
+          author{" "}
           <input
             value={author}
             onChange={({ target }) => setAuthor(target.value)}
           />
         </div>
         <div>
-          published
+          published{" "}
           <input
             type="number"
             value={published}
-            onChange={({ target }) => setPublished(Number(target.value))}
+            onChange={({ target }) => setPublished(target.value)}
           />
         </div>
         <div>

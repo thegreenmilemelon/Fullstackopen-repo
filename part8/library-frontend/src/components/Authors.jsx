@@ -5,6 +5,7 @@ import Select from "react-select";
 
 const Authors = (props) => {
   const result = useQuery(ALL_AUTHORS);
+
   if (!props.show) {
     return null;
   }
@@ -17,6 +18,7 @@ const Authors = (props) => {
     value: a.name,
     label: a.name,
   }));
+  console.log("Authors result: ", result);
 
   return (
     <div>
