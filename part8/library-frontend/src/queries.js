@@ -72,21 +72,8 @@ export const GET_ME = gql`
   }
 `;
 
-export const ALL_BOOKS_WITH_GENRE = gql`
-  query allBooks($genre: String) {
-    allBooks(genre: $genre) {
-      title
-      published
-      author {
-        name
-        born
-      }
-    }
-  }
-`;
-
 export const BOOK_ADDED = gql`
-  subscription {
+  subscription BookAdded {
     bookAdded {
       title
       author {

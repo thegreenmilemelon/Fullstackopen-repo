@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react";
+
 import Authors from "./components/Authors";
 import Books from "./components/Books";
 import NewBook from "./components/NewBook";
 import LoginForm from "./components/LoginForm";
-import { useApolloClient, useQuery } from "@apollo/client";
 import Recommendation from "./components/Recommendation";
-import { GET_ME } from "./queries";
+
+import { useApolloClient, useQuery, useSubscription } from "@apollo/client";
+
+import { GET_ME, BOOK_ADDED } from "./queries";
 
 const App = () => {
   const [page, setPage] = useState("authors");
@@ -13,7 +16,14 @@ const App = () => {
   const client = useApolloClient();
   const [user, setUser] = useState(null);
   const { data } = useQuery(GET_ME);
-  console.log("User: ", data);
+  // console.log("User: ", data);
+
+  useSubscription(BOOK_ADDED, {
+    onSubscriptionData: ({ subscriptionData }) => {
+      console.log("subscriptionData: ", subscriptionData);
+      window.alert(`New book added: ${subscriptionData.data.bookAdded.title}`);
+    },
+  });
 
   const logout = () => {
     setToken(null);
@@ -22,7 +32,9 @@ const App = () => {
   };
 
   useEffect(() => {
+    const token = localStorage.getItem("phonenumbers-user-token");
     if (token) {
+      setToken(token);
       // Fetch user data after login
       if (data?.me) {
         setUser(data);
