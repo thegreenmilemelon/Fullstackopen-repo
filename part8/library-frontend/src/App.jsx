@@ -1,21 +1,34 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Authors from "./components/Authors";
 import Books from "./components/Books";
 import NewBook from "./components/NewBook";
 import LoginForm from "./components/LoginForm";
-import { useApolloClient } from "@apollo/client";
+import { useApolloClient, useQuery } from "@apollo/client";
 import Recommendation from "./components/Recommendation";
+import { GET_ME } from "./queries";
 
 const App = () => {
   const [page, setPage] = useState("authors");
   const [token, setToken] = useState(null);
   const client = useApolloClient();
+  const [user, setUser] = useState(null);
+  const { data } = useQuery(GET_ME);
+  console.log("User: ", data);
 
   const logout = () => {
     setToken(null);
     localStorage.clear();
     client.resetStore();
   };
+
+  useEffect(() => {
+    if (token) {
+      // Fetch user data after login
+      if (data?.me) {
+        setUser(data);
+      }
+    }
+  }, [token, data]);
 
   if (!token) {
     return (
@@ -43,7 +56,7 @@ const App = () => {
       <Books show={page === "books"} />
 
       <NewBook show={page === "add"} />
-      <Recommendation show={page === "recommendations"} />
+      <Recommendation show={page === "recommendations"} user={user} />
     </div>
   );
 };

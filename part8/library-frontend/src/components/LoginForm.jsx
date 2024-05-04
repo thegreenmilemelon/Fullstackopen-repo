@@ -1,12 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from "react";
-import { useMutation, useQuery } from "@apollo/client";
-import { LOGIN, GET_ME } from "../queries";
+import { useMutation } from "@apollo/client";
+import { LOGIN } from "../queries";
 
 const LoginForm = ({ setToken }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const user = useQuery(GET_ME);
 
   const [login, result] = useMutation(LOGIN, {
     onError: (error) => {
@@ -29,7 +28,6 @@ const LoginForm = ({ setToken }) => {
     login({ variables: { username, password } });
     setUsername("");
     setPassword("");
-    console.log("AFter login what is the user:", user);
   };
 
   return (

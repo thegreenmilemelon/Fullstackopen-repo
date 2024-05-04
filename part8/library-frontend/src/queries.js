@@ -84,3 +84,14 @@ export const ALL_BOOKS_WITH_GENRE = gql`
     }
   }
 `;
+
+export const BOOK_ADDED = gql`
+  subscription {
+    bookAdded {
+      title
+      author {
+        name
+      }
+    }
+  }
+`;

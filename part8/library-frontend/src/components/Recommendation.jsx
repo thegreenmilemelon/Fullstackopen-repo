@@ -1,23 +1,22 @@
 import { useQuery } from "@apollo/client";
-import { ALL_BOOKS, GET_ME } from "../queries";
+import { ALL_BOOKS } from "../queries";
 
-const RecommendedBooks = ({ show }) => {
-  const user = useQuery(GET_ME);
+const RecommendedBooks = ({ show, user }) => {
   const { data, error, loading } = useQuery(ALL_BOOKS);
 
   if (!show) {
     return null;
   }
 
-  if (loading || user.loading) {
+  if (loading) {
     <div>fetching data</div>;
   }
 
-  if (error || user.error) {
+  if (error) {
     <div>an error occurred</div>;
   }
 
-  const me = user.data?.me;
+  const me = user?.me;
 
   const favoriteBooks = me
     ? data.allBooks.filter((b) => b.genres.includes(me.favoriteGenre))

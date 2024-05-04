@@ -5,6 +5,9 @@ const Author = require("./models/author");
 const Book = require("./models/book");
 const User = require("./models/user");
 
+const { PubSub } = require("graphql-subscriptions");
+const pubsub = new PubSub();
+
 const resolvers = {
   Author: {
     bookCount: async (root) => {
@@ -50,6 +53,7 @@ const resolvers = {
           },
         });
       }
+
       try {
         let author = await Author.findOne({ name: args.author });
 
@@ -57,16 +61,19 @@ const resolvers = {
           author = new Author({ name: args.author });
           await author.save();
         }
+
         const lowercaseGenres = args.genres.map((genre) => genre.toLowerCase());
         const book = new Book({
           title: args.title,
           published: args.published,
-          author: author._id, // Set the author field to the author's _id
+          author: author._id,
           genres: lowercaseGenres,
         });
 
         const newBook = await book.save();
-        return newBook.populate("author");
+        const populatedBook = await newBook.populate("author");
+        pubsub.publish("BOOK_ADDED", { bookAdded: populatedBook });
+        return populatedBook;
       } catch (error) {
         if (error.name === "ValidationError") {
           throw new GraphQLError(error.message, {
@@ -149,6 +156,12 @@ const resolvers = {
           },
         });
       }
+    },
+  },
+
+  Subscription: {
+    bookAdded: {
+      subscribe: () => pubsub.asyncIterator(["BOOK_ADDED"]),
     },
   },
 };
