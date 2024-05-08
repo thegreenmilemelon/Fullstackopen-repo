@@ -8,7 +8,22 @@ import Recommendation from "./components/Recommendation";
 
 import { useApolloClient, useQuery, useSubscription } from "@apollo/client";
 
-import { GET_ME, BOOK_ADDED } from "./queries";
+import { GET_ME, BOOK_ADDED, ALL_BOOKS } from "./queries";
+
+export const updateCache = (cache, query, addedBook) => {
+  const uniqByTitle = (a) => {
+    let seen = new Set();
+    return a.filter((item) => {
+      let k = item.title;
+      return seen.has(k) ? false : seen.add(k);
+    });
+  };
+  cache.updateQuery(query, ({ allBooks }) => {
+    return {
+      allBooks: uniqByTitle(allBooks.concat(addedBook)),
+    };
+  });
+};
 
 const App = () => {
   const [page, setPage] = useState("authors");
@@ -19,9 +34,11 @@ const App = () => {
   // console.log("User: ", data);
 
   useSubscription(BOOK_ADDED, {
-    onSubscriptionData: ({ subscriptionData }) => {
-      console.log("subscriptionData: ", subscriptionData);
-      window.alert(`New book added: ${subscriptionData.data.bookAdded.title}`);
+    onData: ({ data, client }) => {
+      console.log("subscriptionData: ", data);
+
+      const addedBook = data.data.bookAdded;
+      updateCache(client.cache, { query: ALL_BOOKS }, addedBook);
     },
   });
 
