@@ -37,11 +37,6 @@ mongoose
     console.log("error connection to MongoDB:", error.message);
   });
 
-const server = new ApolloServer({
-  typeDefs,
-  resolvers,
-});
-
 const start = async () => {
   const app = express();
   const httpServer = http.createServer(app);

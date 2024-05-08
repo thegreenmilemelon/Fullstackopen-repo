@@ -11,8 +11,7 @@ const pubsub = new PubSub();
 const resolvers = {
   Author: {
     bookCount: async (root) => {
-      const author = await Author.findOne({ name: root.name });
-      const book = await Book.find({ author: author._id });
+      const book = await Book.find({ author: root._id });
       console.log("Book.count");
       return book.length;
     },
