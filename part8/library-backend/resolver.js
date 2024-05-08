@@ -13,6 +13,7 @@ const resolvers = {
     bookCount: async (root) => {
       const author = await Author.findOne({ name: root.name });
       const book = await Book.find({ author: author._id });
+      console.log("Book.count");
       return book.length;
     },
   },
@@ -34,7 +35,10 @@ const resolvers = {
       }
       return await Book.find(filter).populate("author");
     },
-    allAuthors: async () => Author.find({}),
+    allAuthors: async () => {
+      console.log("author.find");
+      return Author.find({});
+    },
     me: async (root, args, context) => {
       if (!context.currentUser) {
         return null;
