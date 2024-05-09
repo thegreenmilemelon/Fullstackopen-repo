@@ -8,12 +8,17 @@ const User = require("./models/user");
 const { PubSub } = require("graphql-subscriptions");
 const pubsub = new PubSub();
 
+let bookCache = null;
+
 const resolvers = {
   Author: {
     bookCount: async (root) => {
-      const book = await Book.find({ author: root._id });
-      console.log("Book.count");
-      return book.length;
+      if (bookCache) {
+        console.log("Book.count");
+        return bookCache.filter((b) => b.author.toString() === root.id).length;
+      }
+
+      return Book.countDocuments({ author: root.id });
     },
   },
   Query: {
@@ -34,8 +39,15 @@ const resolvers = {
       }
       return await Book.find(filter).populate("author");
     },
-    allAuthors: async () => {
+    allAuthors: async (root, args, context, query) => {
       console.log("author.find");
+      const fieldsNames = query.fieldNodes[0].selectionSet.selections.map(
+        (f) => f.name.value
+      );
+      console.log(fieldsNames);
+      if (fieldsNames.includes("bookCount")) {
+        bookCache = await Book.find({});
+      }
       return Author.find({});
     },
     me: async (root, args, context) => {
