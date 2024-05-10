@@ -16,7 +16,7 @@ interface ExerciseArguments {
 const parseExerciseArguments = (args: string[]): ExerciseArguments => {
   if (args.length < 4) throw new Error("Not enough arguments");
 
-  let target = Number(args[2]);
+  const target = Number(args[2]);
   if (!isNaN(target)) {
     return {
       target,
@@ -62,3 +62,5 @@ try {
   }
   console.log(errorMessage);
 }
+
+export default calculateExercises;
