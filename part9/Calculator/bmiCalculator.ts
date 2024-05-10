@@ -3,6 +3,11 @@ interface BmiValues {
   weight: number;
 }
 
+interface BmiResult {
+  BMI: number;
+  category: string;
+}
+
 const parseArguments = (args: string[]): BmiValues => {
   if (args.length < 4) throw new Error("Not enough arguments");
   if (args.length > 4) throw new Error("Too many arguments");
@@ -17,7 +22,7 @@ const parseArguments = (args: string[]): BmiValues => {
   }
 };
 
-const calculateBmi = (height: number, weight: number): string => {
+const calculateBmi = (height: number, weight: number): BmiResult => {
   const bmiIndex = weight / (height / 100) ** 2;
   let bmiCategory: string;
 
@@ -38,7 +43,11 @@ const calculateBmi = (height: number, weight: number): string => {
       bmiCategory = "Invalid BMI";
   }
 
-  return `BMI: ${bmiIndex.toFixed(2)} (${bmiCategory})`;
+  // return `BMI: ${bmiIndex.toFixed(2)} (${bmiCategory})`;
+  return {
+    BMI: Number(bmiIndex.toFixed(2)),
+    category: bmiCategory,
+  };
 };
 
 try {
@@ -51,3 +60,5 @@ try {
   }
   console.log(errorMessage);
 }
+
+export default calculateBmi;
