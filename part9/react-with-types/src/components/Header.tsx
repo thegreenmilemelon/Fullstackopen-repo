@@ -3,5 +3,5 @@ interface HeaderProps {
 }
 
 export default function Header(props: HeaderProps) {
-  return <div>{props.name}</div>;
+  return <h1>{props.name}</h1>;
 }
