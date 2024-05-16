@@ -59,6 +59,23 @@ const PatientInfo = () => {
             <strong>Date of Birth:</strong> {selectedPatient.dateOfBirth}
           </Typography>
         </Grid>
+        <Grid item xs={12}>
+          <Typography>
+            <strong>Entries:</strong>
+          </Typography>
+          {selectedPatient.entries.map((entry) => (
+            <div key={entry.id}>
+              <Typography>
+                {entry.date} {entry.description}
+              </Typography>
+              <ul>
+                {entry.diagnosisCodes?.map((code, index) => (
+                  <li key={`${entry.id}-${index}`}>{code}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </Grid>
       </Grid>
     </Paper>
   );
