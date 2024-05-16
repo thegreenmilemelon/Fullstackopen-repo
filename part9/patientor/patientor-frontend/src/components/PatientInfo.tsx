@@ -27,10 +27,10 @@ const PatientInfo = () => {
 
   const getGenderIcon = (gender: Gender) => {
     switch (gender) {
-      case Gender.Male:
-        return <MaleIcon />;
-      case Gender.Female:
+      case "female":
         return <FemaleIcon />;
+      case "male":
+        return <MaleIcon />;
       default:
         return null;
     }
@@ -43,12 +43,12 @@ const PatientInfo = () => {
     >
       <Typography variant="h4" gutterBottom>
         {selectedPatient.name}
-        {getGenderIcon(selectedPatient.gender)}
+        {getGenderIcon(selectedPatient?.gender)}
       </Typography>
       <Grid container spacing={2}>
         <Grid item xs={6}>
           <Typography>
-            <strong>SSN:</strong> {selectedPatient.ssn}
+            <strong>SSN:</strong> {selectedPatient?.ssn}
           </Typography>
           <Typography>
             <strong>Occupation:</strong> {selectedPatient.occupation}
