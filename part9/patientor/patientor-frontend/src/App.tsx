@@ -8,6 +8,7 @@ import { Patient } from "./types";
 
 import patientService from "./services/patients";
 import PatientListPage from "./components/PatientListPage";
+import PatientInfo from "./components/PatientInfo";
 
 const App = () => {
   const [patients, setPatients] = useState<Patient[]>([]);
@@ -18,6 +19,7 @@ const App = () => {
     const fetchPatientList = async () => {
       const patients = await patientService.getAll();
       setPatients(patients);
+      console.log("fetched patients", patients);
     };
     void fetchPatientList();
   }, []);
@@ -43,6 +45,7 @@ const App = () => {
                 />
               }
             />
+            <Route path="/patients/:id" element={<PatientInfo />} />
           </Routes>
         </Container>
       </Router>

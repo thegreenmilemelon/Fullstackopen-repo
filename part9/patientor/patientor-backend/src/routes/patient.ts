@@ -26,6 +26,7 @@ router.get("/:id", (req, res) => {
   const id = req.params.id;
   const patient = patientService.getPatient(id);
   if (patient) {
+    console.log(patient);
     res.send(patient);
   } else {
     res.json({ error: "Patient not found" });
