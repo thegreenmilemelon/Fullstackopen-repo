@@ -10,6 +10,16 @@ export interface Diagnosis {
   latin?: string;
 }
 
+export interface SickLeave {
+  startDate: string;
+  endDate: string;
+}
+
+export interface Discharge {
+  date: string;
+  criteria: string;
+}
+
 interface BaseEntry {
   id: string;
   description: string;
@@ -71,4 +81,5 @@ type UnionOmit<T, K extends string | number | symbol> = T extends unknown
   ? Omit<T, K>
   : never;
 // Define Entry without the 'id' property
+
 export type EntryWithoutId = UnionOmit<Entry, "id">;
